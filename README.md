@@ -3,8 +3,6 @@
 **nbstencilaproxy** provides Jupyter server and notebook extensions to proxy Stencila.
 It is based on [**nbrsessionproxy**](https://github.com/jupyterhub/nbrsessionproxy).
 
-![Screenshot](screenshot.png)
-
 If you have a JupyterHub deployment, nbstencilaproxy can take advantage of JupyterHub's existing authenticator and spawner to launch Stencila in users' Jupyter environments. You can also run this from within Jupyter.
 
 ## Installation

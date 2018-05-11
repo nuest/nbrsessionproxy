@@ -21,22 +21,22 @@ define(function(require) {
         menu.append(divider);
 
         /* create our list item */
-        var rsession_item = $('<li>')
+        var stencilasession_item = $('<li>')
             .attr('role', 'presentation')
-            .addClass('new-rstudio');
+            .addClass('new-stencila');
 
         /* create our list item's link */
-        var rsession_link = $('<a>')
+        var stencilasession_link = $('<a>')
             .attr('role', 'menuitem')
             .attr('tabindex', '-1')
-            .attr('href', base_url + 'rstudio/')
+            .attr('href', base_url + 'stencila/')
             .attr('target', '_blank')
-            .text('RStudio Session');
+            .text('Stencila Session');
 
         /* add the link to the item and
          * the item to the menu */
-        rsession_item.append(rsession_link);
-        menu.append(rsession_item);
+        stencilasession_item.append(stencilasession_link);
+        menu.append(stencilasession_item);
     }
 
     return {

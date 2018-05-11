@@ -1,34 +1,37 @@
 FROM jupyter/r-notebook
 
+# give NB_USER rights in the installation directory
+ENV STENCILA_DIR /opt/stencila
 USER root
+RUN mkdir -p ${STENCILA_DIR} && chown -R ${NB_USER} ${STENCILA_DIR}
 
-RUN apt-get update && \
-	apt-get install -y --no-install-recommends \
-		libapparmor1 \
-		libedit2 \
-		lsb-release \
-		;
+# install Stencila as NB_USER
+USER ${NB_USER}
+WORKDIR ${STENCILA_DIR}
+ADD package.json package.json
+RUN npm install
+ADD stencila.js stencila.js
+ADD stencila-host.js stencila-host.js
+ADD index.html index.html
+ADD app.js app.js
 
-# You can use rsession from rstudio's desktop package as well.
-ENV RSTUDIO_PKG=rstudio-server-1.0.136-amd64.deb
+WORKDIR ${HOME}
+ADD requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache -r /tmp/requirements.txt
 
-RUN wget -q http://download2.rstudio.org/${RSTUDIO_PKG}
-RUN dpkg -i ${RSTUDIO_PKG}
-RUN rm ${RSTUDIO_PKG}
+# https://github.com/r-lib/devtools/issues/1722
+ENV TAR /bin/tar
 
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+ADD install.R install.R
+RUN Rscript install.R
 
-USER $NB_USER
+#RUN test -d ${HOME}/.jupyter/ || mkdir ${HOME}/.jupyter/
+#ADD jupyter_notebook_config.py ${HOME}/.jupyter/jupyter_notebook_config.py
 
-RUN pip install git+https://github.com/jupyterhub/nbserverproxy.git
-RUN jupyter serverextension enable --sys-prefix --py nbserverproxy
+#RUN pip install git+https://github.com/jupyterhub/nbserverproxy.git
+#RUN jupyter serverextension enable --sys-prefix --py nbserverproxy
 
-RUN pip install git+https://github.com/jupyterhub/nbrsessionproxy.git
-RUN jupyter serverextension enable --sys-prefix --py nbrsessionproxy
-RUN jupyter nbextension install    --sys-prefix --py nbrsessionproxy
-RUN jupyter nbextension enable     --sys-prefix --py nbrsessionproxy
-
-# The desktop package uses /usr/lib/rstudio/bin
-ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
-ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
+RUN pip install git+https://github.com/nuest/nbstencilaproxy.git
+RUN jupyter serverextension enable --sys-prefix --py nbstencilaproxy
+RUN jupyter nbextension install    --sys-prefix --py nbstencilaproxy
+RUN jupyter nbextension enable     --sys-prefix --py nbstencilaproxy

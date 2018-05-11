@@ -72,14 +72,3 @@ def add_handlers(app):
             )),
         ),
     ])
-
-
-# fake a module to load the proxy handler as an extension
-module_name = '_myproxymod'
-import types
-mod = types.ModuleType(module_name)
-sys.modules[module_name] = mod
-mod.load_jupyter_server_extension = add_handlers
-c.NotebookApp.nbserver_extensions.update({
-    module_name: True,
-})
